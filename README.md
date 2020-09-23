@@ -10,4 +10,4 @@
 # ConnectionResetEroor
 1画像毎に5秒待機してダウンロード先のサーバに過負荷をかけたり、ConnectionResetErrorが出ないようにしていますが、  
 もしエラーでダウンロードできなかったファイルがあった場合(ValueErrorとConnectionResetErrorの場合は)
-ダウンロード失敗したファイル名をfailed_file.logとして保存先ディレクトリに作成します。
+ダウンロード失敗したファイル名とエラー名の一覧をfailed_file.logとして保存先ディレクトリに作成します。
