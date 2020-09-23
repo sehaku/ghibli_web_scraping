@@ -1,13 +1,19 @@
-import requests
-import time
 from bs4 import BeautifulSoup
 import os
+import requests
+import sys
+import time
 
 
 def main():
     failed_file = []
-    print("Paste in the download path.")
-    path_parent = str(input())
+    path_parent = ""
+    while not os.path.isdir(path_parent):
+        print("Type or paste the download path below.")
+        path_parent = str(input())
+        if not os.path.isdir(path_parent):
+            print("The path you specified does not exist.")
+    print("Preparing for download...")
     URL = "http://www.ghibli.jp/works/"
     res_parent = requests.get(URL)
     soup_parent = BeautifulSoup(res_parent.text, "html.parser")
@@ -18,7 +24,7 @@ def main():
         split_link = link.split("/")
         save_path = os.path.join(path_parent, split_link[-2])
         links = scrape_links(link)
-        print(links)
+        # print(links)
         if len(links) > 0:
             if os.path.isdir(path_parent) and not os.path.isdir(save_path):
                 os.mkdir(save_path)
@@ -26,13 +32,17 @@ def main():
                 dl_img_files(links, save_path, failed_file, split_link)
 
     if len(failed_file) > 0:
-        output_dl_failed_file(path_parent, failed_file)
+        output_dl_failed_file(path_parent, path_parent, failed_file)
+    sys.exit(0)
 
 
-def output_dl_failed_file(path: str, failed_file: str):
+def output_dl_failed_file(path: str, path_parent: str, failed_file: str):
     with open(os.path.join(path, "failed_file.log"), "w") as f:
         for i in failed_file:
             f.write("".join([i, "\n"]))
+        print("\nSome of the image(s) failed to download.")
+        print("If you want to check this, see", path_parent, "\\failed_file.log\n")
+        input("Press Enter(Return) to exit.")
 
 
 def scrape_links(link: str) -> list:
@@ -44,22 +54,25 @@ def scrape_links(link: str) -> list:
 
 
 def dl_img_files(links: list, save_path: str, failed_file: list, split_link: list):
+    print("Downloading now...")
     for img_url in links:
         time.sleep(5.0)
         file_name = os.path.basename(img_url)
         dst_path = os.path.join(save_path, file_name)
+        msg = ""
         try:
             image = requests.get(img_url)
             open(dst_path, "wb").write(image.content)
-            print("Downloaded", dst_path)
+            msg = "Downloaded " + file_name + " to " + save_path
         except ValueError:
-            print("ValueError", img_url)
+            msg = "Failed to download " + file_name + " : reason->ValueError"
             valerr_str = img_url.split("/")
             failed_file.append("".join(["ValueError : ", valerr_str[-1]]))
         except ConnectionResetError:
-            print("ConnectionResetError", img_url)
+            msg = "Failed to download " + file_name + " : reason->ConnectionResetError"
             reset_str = img_url.split("/")
             failed_file.append("".join([split_link[-2], " : ", reset_str[-1]]))
+        print(msg)
 
 
 if __name__ == "__main__":
