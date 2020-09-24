@@ -4,8 +4,8 @@
 
 # 必要な環境
 * python実行環境
-* BeautifulSoup(インストール方法 : pip install beautifulsoup4)
-* requests(インストール方法 : pip install requests)
+* BeautifulSoup(インストール方法 : pip3 install beautifulsoup4)
+* requests(インストール方法 : pip3 install requests)
 
 # ConnectionResetEroor
 1画像毎に5秒待機してダウンロード先のサーバに過負荷をかけたり、ConnectionResetErrorが出ないようにしていますが、  
